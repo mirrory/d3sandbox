@@ -1,0 +1,17 @@
+.main {
+  display: flex;
+  padding: 5% 10% 5% 10%;
+}
+
+.title {
+  padding: 0% 5% 0% 5%;;
+}
+
+.viz {
+  width: 50%;
+  padding-right: 10px;
+}
+
+.ctrls {
+  width: 50%;
+}
