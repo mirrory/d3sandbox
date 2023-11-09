@@ -45,20 +45,27 @@ import Typography from '@mui/material/Typography';
 // add'l : what if add visual sparql data queries?
 // like make it very easy to visualize data from sparql
 
+// Initial dataset to load
 let initialData = [
-{id: 1, state: "NY", county: "D", rate: 3.2}, 
-{id: 2, state: "DE", county: "M", rate: 5.1}
+  {id: 1, state: "NY", county: "D", rate: 3.2}, 
+  {id: 2, state: "DE", county: "M", rate: 5.1},
+  {id: 3, state: "AZ", county: "B", rate: 1.1}, 
+  {id: 4, state: "CA", county: "A", rate: 2.4},
+  {id: 5, state: "ND", county: "C", rate: 3.8}, 
+  {id: 6, state: "IN", county: "M", rate: 4.5}
 ]
 
+// Icons
 let expandIco = <svg xmlns="http://www.w3.org/2000/svg" width="16" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
-
 let addIco = <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-
 let deleteIco = <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
 
+// Renders not only the Chart but all UI Controls
 function Renderer() {
   // should be color picker - react package for color picker?
   // could also fill in color names with preview swatches.
+
+  // Refs
   const chartColorInputRef = useRef(null);
   const userVarNameInputRef = useRef(null);
   const addFileInputRef = useRef(null);
@@ -68,25 +75,46 @@ function Renderer() {
   const selectionInputRef = useRef(null);
   const eventNameInputRef = useRef(null);
   const transitionTimeInputRef = useRef(null);
+  const xAxisLabelRef = useRef(null);
+  const yAxisLabelRef = useRef(null);
 
+  // States
   const [chartColor, setChartColor] = useState("steelblue");
-  const [userVarName, setUserVarName] = useState("test");
+  const [userVarName, setUserVarName] = useState("myVar");
   const [aFile, setAFile] = useState(initialData);
   const [dsvDelimiter, setDsvDelimiter] = useState(",");
   const [randomDistribution, setRandomDistribution] = useState("");
   const [path, setPath] = useState("");
   const [selection, setSelection] = useState("");
-  const [eventName, setEventName] = useState("testevent");
+  const [eventName, setEventName] = useState("myEvent");
   const [transitionTime, setTransitionTime] = useState(100);
-
+  const [xAxisLabel, setXAxisLabel] = useState("");
+  const [yAxisLabel, setYAxisLabel] = useState("");
   const [variables, setVariables] = useState([]); 
 
+  // Handlers
   const handleColorChangeBlur = () => {
     setChartColor(chartColorInputRef.current.value)
   };
   const handleColorChangeEnter = (e) => {
     if (e.keyCode == 13){
         setChartColor(chartColorInputRef.current.value)
+    }
+  };
+  const handleXAxisLabelChangeBlur = () => {
+    setXAxisLabel(xAxisLabelRef.current.value)
+  };
+  const handleXAxisLabelChangeEnter = (e) => {
+    if (e.keyCode == 13){
+        setXAxisLabel(xAxisLabelRef.current.value)
+    }
+  };
+  const handleYAxisLabelChangeBlur = () => {
+    setYAxisLabel(yAxisLabelRef.current.value)
+  };
+  const handleYAxisLabelChangeEnter = (e) => {
+    if (e.keyCode == 13){
+        setYAxisLabel(yAxisLabelRef.current.value)
     }
   };
   const handleUserVarNameChange = () => {
@@ -116,12 +144,15 @@ function Renderer() {
 
   const handleAddVariableClick = () => {
     let newVar = <Accordion key={variables.length}>
-    <AccordionSummary>
-    <button onClick={handleDeleteVariableClick()}>{deleteIco}</button> 
-    </AccordionSummary>
-    <AccordionDetails>
-    </AccordionDetails>
-    </Accordion>
+                  <AccordionSummary>
+                    <button onClick={handleDeleteVariableClick(variables.length)}>{deleteIco}</button> 
+                    &nbsp;&nbsp;&nbsp;{userVarName}
+                  </AccordionSummary>
+                  <AccordionDetails>
+                  </AccordionDetails>
+                </Accordion>
+    userVarNameInputRef.current.value = "";
+    setUserVarName("");
     setVariables(variables => [...variables, newVar])
   }
 
@@ -130,6 +161,7 @@ function Renderer() {
     setVariables(newList)
   }
 
+  // Set the input data based on an input file
   const setFileData = (e) => {
     let reader = new FileReader()
     reader.onload = onRenderLoad;
@@ -141,7 +173,7 @@ function Renderer() {
   return (
     <div className="main">
       <div id="viz" className="viz">
-        <Chart data={aFile} color={chartColor} vars={variables} />
+        <Chart data={aFile} color={chartColor} vars={variables} xAxisLabel={xAxisLabel} yAxisLabel={yAxisLabel} />
       </div>
       <div className="ctrls">
         <Accordion>
@@ -167,6 +199,14 @@ function Renderer() {
             <Typography>
               File:&nbsp;
               <input ref={addFileInputRef} onChange={setFileData} id="fileInput" type="file" onBlur={handleAFileChange}></input>
+            </Typography>
+            <Typography>
+              <span title="Sets the X (horizontal) axis label text.">X-Axis Label Text:</span>&nbsp;
+              <input ref={xAxisLabelRef} id="xAxisLabelInput" type="text" onBlur={handleXAxisLabelChangeBlur} onKeyDown={handleXAxisLabelChangeEnter}></input>
+            </Typography>
+            <Typography>
+              <span title="Sets the Y (vertical) axis label text.">Y-Axis Label Text:</span>&nbsp;
+              <input ref={yAxisLabelRef} id="yAxisLabelInput" type="text" onBlur={handleYAxisLabelChangeBlur} onKeyDown={handleYAxisLabelChangeEnter}></input>
             </Typography>
           </AccordionDetails>
         </Accordion>

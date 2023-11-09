@@ -10,13 +10,13 @@ const Chart = (props) => {
 // Released under the ISC license.
 // https://observablehq.com/@d3/histogram
 function ChartSet(data, {
-  value = d => d, // convenience alias for x
+  value = d => d.rate, // convenience alias for x
   domain, // convenience alias for xDomain
   label, // convenience alias for xLabel
   format, // convenience alias for xFormat
   type = d3.scaleLinear, // convenience alias for xType
-  x = value, // given d in data, returns the (quantitative) x-value
-  y = () => 1, // given d in data, returns the (quantitative) weight
+  x = d => d.id, // given d in data, returns the (quantitative) x-value
+  y = value, // given d in data, returns the (quantitative) weight
   thresholds = 40, // approximate number of bins to generate, or threshold function
   normalize, // whether to normalize values to a total of 100%
   marginTop = 20, // top margin, in pixels
@@ -38,6 +38,7 @@ function ChartSet(data, {
   yLabel = "↑ Frequency", // a label for the y-axis
   yFormat = normalize ? "%" : undefined, // a format specifier string for the y-axis
   color = "currentColor", // bar fill color
+  title = "Data",
   uservars = [],
   axes = [],
   brushes = [],
@@ -1947,13 +1948,15 @@ let unemployment = [{id: 1, state: "NY", county: "D", rate: 5.1},
     container.append("circle").attr("r", 25); */
     ChartSet(props.data, {
     value: d => d.rate,
-    label: "Rate (%) →",
+    // label: "Rate (%) →",
     width: 500,
     height: 500,
     color: props.color,
-    uservars: props.vars
+    uservars: props.vars,
+    xLabel: props.xAxisLabel,
+    yLabel: props.yAxisLabel
   })
-  }, [props.data, props.color]); // redraw chart if data changes
+  }, [props.data, props.color, props.xAxisLabel, props.yAxisLabel]); // redraw chart if data changes
 
   return <svg ref={svgRef} />;
 };
